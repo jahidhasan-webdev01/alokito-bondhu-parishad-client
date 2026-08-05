@@ -19,12 +19,11 @@ export default async function DashboardLayout({
 
 
     const token =
-        cookieStore.get(
-            "accessToken"
-        );
+        cookieStore.get("accessToken");
 
 
 
+    // No token -> login
     if (!token) {
 
         redirect("/login");
@@ -33,40 +32,40 @@ export default async function DashboardLayout({
 
 
 
-    // Verify token with backend
-
     try {
 
 
-        const res =
-            await fetch(
-                `${API_URL}/admin/me`,
-                {
-                    method:"GET",
+        const res = await fetch(
+            `${API_URL}/admin/me`,
+            {
+                method: "GET",
 
-                    headers:{
-                        Cookie:
-                            `${token.name}=${token.value}`
-                    },
+                headers: {
+                    Cookie:
+                        `${token.name}=${token.value}`,
+                },
 
-                    cache:"no-store"
-                }
-            );
-
+                cache: "no-store",
+            }
+        );
 
 
-        if(!res.ok){
+
+        if (!res.ok) {
 
             redirect("/login");
 
         }
 
 
-    } catch(error){
+
+    } catch (error) {
+
 
         redirect("/login");
 
     }
+
 
 
 
