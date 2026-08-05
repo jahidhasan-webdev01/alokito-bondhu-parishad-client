@@ -7,69 +7,71 @@ import { useState } from "react";
 
 
 export function DateInput({
-    label,
-    name,
-    required,
-}:{
-    label:string;
-    name:string;
-    required?:boolean;
+  label,
+  name,
+  required,
+}: {
+  label: string;
+  name: string;
+  required?: boolean;
 }) {
 
 
-    const [date,setDate] =
-        useState<Date | null>(null);
+  const [date, setDate] =
+    useState<Date | null>(null);
 
 
 
-    return (
+  return (
 
-        <div>
+    <div>
 
-            <label
-                className="
+      <label
+        className="
                     mb-2
                     block
                     text-sm
                     font-medium
                     text-brand-green
                 "
-            >
+      >
 
-                {label}
+        {label}
 
-                {
-                    required &&
-                    <span className="text-red-500">
-                        *
-                    </span>
-                }
+        {
+          required &&
+          <span className="text-red-500">
+            *
+          </span>
+        }
 
-            </label>
+      </label>
 
 
 
-            <DatePicker
+      <DatePicker
 
-                selected={date}
+        selected={date}
 
-                onChange={(value)=>{
+        onChange={(value: Date | null | [Date | null, Date | null]) => {
+          if (Array.isArray(value)) {
+            setDate(value[0]);
+          } else {
+            setDate(value);
+          }
+        }}
 
-                    setDate(value);
+        dateFormat="dd-MM-yyyy"
 
-                }}
+        placeholderText="DD-MM-YYYY"
 
-                dateFormat="dd-MM-yyyy"
+        required={required}
 
-                placeholderText="DD-MM-YYYY"
+        name={name}
 
-                required={required}
+        wrapperClassName="w-full"
 
-                name={name}
-
-                wrapperClassName="w-full"
-
-                className="
+        className="
                     w-full
                     rounded-lg
                     border
@@ -82,31 +84,31 @@ export function DateInput({
                     focus:border-brand-green
                 "
 
-            />
+      />
 
 
-            {/* Send ISO date to backend */}
+      {/* Send ISO date to backend */}
 
-            <input
+      <input
 
-                type="hidden"
+        type="hidden"
 
-                name={name}
+        name={name}
 
-                value={
-                    date
-                    ?
-                    date.toISOString()
-                    :
-                    ""
-                }
+        value={
+          date
+            ?
+            date.toISOString()
+            :
+            ""
+        }
 
-            />
+      />
 
 
-        </div>
+    </div>
 
-    );
+  );
 
 }
 
