@@ -57,7 +57,7 @@ export function AuthProvider({
 
 
                 const res = await fetch(
-                    "/api/admin/me",
+                    `${process.env.NEXT_PUBLIC_API_URL}/admin/me`,
                     {
                         method: "GET",
                         credentials: "include",
