@@ -65,6 +65,12 @@ export function AuthProvider({
                     }
                 );
 
+                console.log("STATUS:", res.status);
+
+                const data = await res.json();
+
+                console.log("DATA:", data);
+
 
 
                 if (res.ok) {
