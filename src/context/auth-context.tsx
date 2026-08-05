@@ -15,9 +15,11 @@ type AuthContextType = {
 
     loading: boolean;
 
-    login: () => void;
+    login: () => Promise<void>;
 
-    logout: () => void;
+    logout: () => Promise<void>;
+
+    refreshAuth: () => Promise<void>;
 
 };
 
@@ -27,6 +29,7 @@ const AuthContext =
     createContext<AuthContextType | undefined>(
         undefined
     );
+
 
 
 
@@ -47,61 +50,71 @@ export function AuthProvider({
 
 
 
-    useEffect(() => {
+    const refreshAuth = async () => {
 
 
-        const checkAuth = async () => {
+        try {
 
 
-            try {
-
-
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/admin/me`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                        cache: "no-store",
-                    }
-                );
-
-                console.log("STATUS:", res.status);
-
-                const data = await res.json();
-
-                console.log("DATA:", data);
-
-
-
-                if (res.ok) {
-
-                    setAdmin(true);
-
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/admin/me`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
                 }
-                else {
+            );
 
-                    setAdmin(false);
 
-                }
+            console.log(
+                "AUTH STATUS:",
+                res.status
+            );
 
+            console.log("res.ok", res.ok);
+
+            if (res.ok) {
+
+                setAdmin(true);
 
             }
-            catch (error) {
+            else {
 
                 setAdmin(false);
 
             }
-            finally {
-
-                setLoading(false);
-
-            }
-
-        };
 
 
-        checkAuth();
+        }
+        catch(error) {
 
+
+            console.log(
+                "AUTH ERROR:",
+                error
+            );
+
+
+            setAdmin(false);
+
+
+        }
+        finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
+
+
+
+
+
+    useEffect(() => {
+
+        refreshAuth();
 
     }, []);
 
@@ -110,11 +123,19 @@ export function AuthProvider({
 
 
 
-    const login = () => {
 
-        setAdmin(true);
+
+    const login = async () => {
+
+
+        await refreshAuth();
+
 
     };
+
+
+
+
 
 
 
@@ -125,12 +146,23 @@ export function AuthProvider({
 
         try {
 
+
             await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/admin/logout`,
                 {
                     method: "POST",
                     credentials: "include",
                 }
+            );
+
+
+        }
+        catch(error) {
+
+
+            console.log(
+                "Logout error:",
+                error
             );
 
 
@@ -150,6 +182,9 @@ export function AuthProvider({
 
 
 
+
+
+
     return (
 
         <AuthContext.Provider
@@ -163,6 +198,8 @@ export function AuthProvider({
                 login,
 
                 logout,
+
+                refreshAuth,
 
             }}
 
@@ -180,21 +217,30 @@ export function AuthProvider({
 
 
 
+
+
+
 export function useAuth() {
+
 
     const context =
         useContext(AuthContext);
 
 
+
     if (!context) {
+
 
         throw new Error(
             "useAuth must be inside AuthProvider"
         );
 
+
     }
 
 
+
     return context;
+
 
 }
