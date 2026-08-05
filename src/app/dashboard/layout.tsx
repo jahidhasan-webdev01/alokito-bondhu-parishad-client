@@ -1,10 +1,10 @@
 import Sidebar from "@/components/dashboard/sidebar";
 import Container from "@/components/ui/container";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+// import { redirect } from "next/navigation";
+// import { cookies } from "next/headers";
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
 
@@ -15,58 +15,58 @@ export default async function DashboardLayout({
 }) {
 
 
-    const cookieStore = await cookies();
+    // const cookieStore = await cookies();
 
 
-    const token =
-        cookieStore.get(
-            "accessToken"
-        );
-
-
-
-    if (!token) {
-
-        redirect("/login");
-
-    }
+    // const token =
+    //     cookieStore.get(
+    //         "accessToken"
+    //     );
 
 
 
-    // Verify token with backend
+    // if (!token) {
 
-    try {
+    //     redirect("/login");
 
-
-        const res =
-            await fetch(
-                `${API_URL}/admin/me`,
-                {
-                    method:"GET",
-
-                    headers:{
-                        Cookie:
-                            `${token.name}=${token.value}`
-                    },
-
-                    cache:"no-store"
-                }
-            );
+    // }
 
 
 
-        if(!res.ok){
+    // // Verify token with backend
 
-            redirect("/login");
-
-        }
+    // try {
 
 
-    } catch(error){
+    //     const res =
+    //         await fetch(
+    //             `${API_URL}/admin/me`,
+    //             {
+    //                 method:"GET",
 
-        redirect("/login");
+    //                 headers:{
+    //                     Cookie:
+    //                         `${token.name}=${token.value}`
+    //                 },
 
-    }
+    //                 cache:"no-store"
+    //             }
+    //         );
+
+
+
+    //     if(!res.ok){
+
+    //         redirect("/login");
+
+    //     }
+
+
+    // } catch(error){
+
+    //     redirect("/login");
+
+    // }
 
 
 
