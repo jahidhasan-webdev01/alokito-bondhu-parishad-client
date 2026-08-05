@@ -7,14 +7,14 @@ export function proxy(request: NextRequest) {
   console.log("TOKEN IN PROXY", token);
   console.log("pathname IN PROXY", pathname);
 
-  if (pathname.startsWith("/dashboard") && !token) {
-    console.log("LLLLLLELELELELELLE");
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // if (pathname.startsWith("/dashboard") && !token) {
+  //   console.log("LLLLLLELELELELELLE");
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/dashboard/:path*"]
-};
+// export const config = {
+//   matcher: ["/dashboard/:path*"]
+// };
