@@ -307,7 +307,7 @@ export default function MembersPage() {
 
                       <p
                         className="
-                                                text-sm
+                                                text-sm font-bold
                                                 text-gray-500
                                             "
                       >
