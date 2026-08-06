@@ -1,260 +1,130 @@
 "use client";
 
 import Image from "next/image";
-import {
-    Search,
-    UserRound,
-    Wallet,
-    Users,
-} from "lucide-react";
+import { Search, UserRound, Wallet, Users } from "lucide-react";
 
-import {
-    motion
-} from "framer-motion";
+import { motion } from "framer-motion";
 
-import {
-    useEffect,
-    useMemo,
-    useState
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Link from "next/link";
 
 import Container from "@/components/ui/container";
 
-
-const API_URL =
-    process.env.NEXT_PUBLIC_API_URL;
-
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 enum UserStatus {
-
-    ACTIVE="ACTIVE",
-    INACTIVE="INACTIVE",
-    REMOVED="REMOVED"
-
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  REMOVED = "REMOVED",
 }
 
-
-
 type Member = {
+  id: string;
 
-    id:string;
+  memberId: string;
 
-    memberId:string;
+  fullName: string;
 
-    fullName:string;
+  mobile: string;
 
-    mobile:string;
+  district: string;
 
-    district:string;
+  image?: string;
 
-    image?:string;
+  status: UserStatus;
 
-    status:UserStatus;
+  totalBalance: number;
 
-    totalBalance:number;
-
+  bloodGroup: string;
 };
 
-
-
-
-export default function MembersPage(){
-
-
-    const [
-        members,
-        setMembers
-    ] = useState<Member[]>([]);
-
-
-
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
-
-
-
-    const [
-        search,
-        setSearch
-    ] = useState("");
-
-
-
-
-
-    useEffect(()=>{
-
-
-        const fetchMembers =
-        async()=>{
-
-
-            try{
-
-
-                const res =
-                    await fetch(
-                        `${API_URL}/users`,
-                        {
-                            credentials:"include",
-                            cache:"no-store"
-                        }
-                    );
-
-
-                const result =
-                    await res.json();
-
-
-
-                setMembers(
-                    result.data ?? []
-                );
-
-
-            }
-            catch(error){
-
-                console.log(error);
-
-            }
-            finally{
-
-                setLoading(false);
-
-            }
-
-
-        };
-
-
-
-        fetchMembers();
-
-
-    },[]);
-
-
-
-
-
-
-
-    const filteredMembers =
-    useMemo(()=>{
-
-
-        const keyword =
-            search
-            .toLowerCase()
-            .trim();
-
-
-
-        if(!keyword)
-            return members;
-
-
-
-        return members.filter(
-            member=>
-
-                member.memberId
-                .toLowerCase()
-                .includes(keyword)
-
-                ||
-
-                member.fullName
-                .toLowerCase()
-                .includes(keyword)
-
-                ||
-
-                member.mobile
-                .includes(keyword)
-
-        );
-
-
-    },[
-        search,
-        members
-    ]);
-
-
-
-
-
-
-
-    return (
-
-        <Container>
-
-
-            <motion.div
-
-                initial={{
-                    opacity:0,
-                    y:20
-                }}
-
-                animate={{
-                    opacity:1,
-                    y:0
-                }}
-
-                className="
+export default function MembersPage() {
+  const [members, setMembers] = useState<Member[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await fetch(`${API_URL}/users`, {
+          credentials: "include",
+          cache: "no-store",
+        });
+
+        const result = await res.json();
+
+        setMembers(result.data ?? []);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+
+  const filteredMembers = useMemo(() => {
+    const keyword = search.toLowerCase().trim();
+
+    if (!keyword) return members;
+
+    return members.filter(
+      (member) =>
+        member.memberId.toLowerCase().includes(keyword) ||
+        member.fullName.toLowerCase().includes(keyword) ||
+        member.mobile.includes(keyword),
+    );
+  }, [search, members]);
+
+  console.log("membe", members);
+
+  return (
+    <Container>
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        className="
                     space-y-8
                     py-8
                 "
+      >
+        {/* Header */}
 
-            >
-
-
-
-                {/* Header */}
-
-                <div>
-
-                    <h1
-                        className="
+        <div>
+          <h1
+            className="
                             text-3xl
                             font-bold
                             text-brand-green
                         "
-                    >
-                        All Members
-                    </h1>
+          >
+            All Members
+          </h1>
 
-
-                    <p
-                        className="
+          <p
+            className="
                             mt-2
                             text-gray-500
                         "
-                    >
-                        View and manage all members.
-                    </p>
+          >
+            View and manage all members.
+          </p>
+        </div>
 
-                </div>
+        {/* Search */}
 
-
-
-
-
-
-
-                {/* Search */}
-
-                <div
-                    className="
+        <div
+          className="
                         flex
                         items-center
                         gap-3
@@ -262,104 +132,58 @@ export default function MembersPage(){
                         border-brand-gold/30
                         pb-3
                     "
-                >
+        >
+          <Search size={20} className="text-brand-green" />
 
-                    <Search
-                        size={20}
-                        className="text-brand-green"
-                    />
-
-
-                    <input
-
-                        value={search}
-
-                        onChange={(e)=>
-                            setSearch(
-                                e.target.value
-                            )
-                        }
-
-                        placeholder="
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="
                             Search by name, ID or mobile
                         "
-
-                        className="
+            className="
                             w-full
                             bg-transparent
                             outline-none
                         "
+          />
+        </div>
 
-                    />
+        {/* Cards */}
 
-                </div>
-
-
-
-
-
-
-
-                {/* Cards */}
-
-
-                {
-                    loading ?
-
-
-                    <div
-                        className="
+        {loading ? (
+          <div
+            className="
                             grid
                             gap-5
                             sm:grid-cols-2
                             xl:grid-cols-3
                         "
-                    >
-
-                        {
-                            Array
-                            .from({
-                                length:6
-                            })
-                            .map((_,i)=>(
-
-                                <div
-
-                                    key={i}
-
-                                    className="
+          >
+            {Array.from({
+              length: 6,
+            }).map((_, i) => (
+              <div
+                key={i}
+                className="
                                         h-56
                                         animate-pulse
                                         rounded-xl
                                         border
                                         border-brand-gold/20
                                     "
-
-                                />
-
-                            ))
-                        }
-
-                    </div>
-
-
-                    :
-
-
-                    filteredMembers.length===0 ?
-
-
-                    <motion.div
-
-                        initial={{
-                            opacity:0
-                        }}
-
-                        animate={{
-                            opacity:1
-                        }}
-
-                        className="
+              />
+            ))}
+          </div>
+        ) : filteredMembers.length === 0 ? (
+          <motion.div
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            className="
                             flex
                             flex-col
                             items-center
@@ -367,102 +191,61 @@ export default function MembersPage(){
                             py-20
                             text-center
                         "
-
-                    >
-
-                        <Users
-                            size={60}
-                            className="
+          >
+            <Users
+              size={60}
+              className="
                                 text-brand-green/40
                             "
-                        />
+            />
 
-
-                        <h2
-                            className="
+            <h2
+              className="
                                 mt-5
                                 text-xl
                                 font-semibold
                                 text-brand-green
                             "
-                        >
-                            No members found
-                        </h2>
+            >
+              No members found
+            </h2>
 
-
-                        <p
-                            className="
+            <p
+              className="
                                 mt-2
                                 text-gray-500
                             "
-                        >
-                            There are currently no members available.
-                        </p>
-
-
-                    </motion.div>
-
-
-                    :
-
-
-                    <div
-
-                        className="
+            >
+              There are currently no members available.
+            </p>
+          </motion.div>
+        ) : (
+          <div
+            className="
                             grid
                             gap-5
                             sm:grid-cols-2
                             lg:grid-cols-3
                         "
-
-                    >
-
-
-                    {
-                        filteredMembers.map(
-                            (
-                                member,
-                                index
-                            )=>(
-
-
-                            <Link
-
-                                key={member.id}
-
-                                href={
-                                    `/members/${member.memberId}`
-                                }
-
-                            >
-
-
-                            <motion.div
-
-
-                                initial={{
-                                    opacity:0,
-                                    y:30
-                                }}
-
-
-                                animate={{
-                                    opacity:1,
-                                    y:0
-                                }}
-
-
-                                transition={{
-                                    delay:index*.05
-                                }}
-
-
-                                whileHover={{
-                                    y:-6
-                                }}
-
-
-                                className="
+          >
+            {filteredMembers.map((member, index) => (
+              <Link key={member.id} href={`/members/${member.memberId}`}>
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    y: 30,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  transition={{
+                    delay: index * 0.05,
+                  }}
+                  whileHover={{
+                    y: -6,
+                  }}
+                  className="
                                     cursor-pointer
                                     rounded-xl
                                     border
@@ -471,51 +254,30 @@ export default function MembersPage(){
                                     transition
                                     hover:border-brand-green/50
                                 "
-
-                            >
-
-
-
-                                <div
-                                    className="
+                >
+                  <div
+                    className="
                                         flex
                                         items-center
                                         gap-4
                                     "
-                                >
-
-
-                                {
-                                    member.image ?
-
-                                    <Image
-
-                                        src={
-                                            member.image
-                                        }
-
-                                        alt={
-                                            member.fullName
-                                        }
-
-                                        width={80}
-
-                                        height={80}
-
-                                        className="
+                  >
+                    {member.image ? (
+                      <Image
+                        src={member.image}
+                        alt={member.fullName}
+                        width={80}
+                        height={80}
+                        className="
                                             h-20
                                             w-20
                                             rounded-full
                                             object-cover
                                         "
-
-                                    />
-
-                                    :
-
-
-                                    <div
-                                        className="
+                      />
+                    ) : (
+                      <div
+                        className="
                                             flex
                                             h-20
                                             w-20
@@ -524,77 +286,67 @@ export default function MembersPage(){
                                             rounded-full
                                             bg-brand-green/10
                                         "
-                                    >
-
-                                        <UserRound
-                                            className="
+                      >
+                        <UserRound
+                          className="
                                                 text-brand-green
                                             "
-                                        />
+                        />
+                      </div>
+                    )}
 
-                                    </div>
-
-
-                                }
-
-
-
-                                    <div>
-
-                                        <h2
-                                            className="
+                    <div>
+                      <h2
+                        className="
                                                 font-bold
                                                 text-brand-green
                                             "
-                                        >
+                      >
+                        {member.fullName}
+                      </h2>
 
-                                            {
-                                                member.fullName
-                                            }
-
-                                        </h2>
-
-
-                                        <p
-                                            className="
+                      <p
+                        className="
                                                 text-sm
                                                 text-gray-500
                                             "
-                                        >
+                      >
+                        {member.memberId}
+                      </p>
 
-                                            {
-                                                member.memberId
-                                            }
-
-                                        </p>
-
-
-                                        <p
-                                            className="
+                      <p
+                        className="
                                                 text-sm
                                                 text-gray-500
                                             "
-                                        >
+                      >
+                        {member.mobile}
+                      </p>
 
-                                            {
-                                                member.mobile
-                                            }
+                      <p
+                        className="
+        mt-2
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        bg-red-50
+        px-3
+        py-1
+        text-xs
+        font-semibold
+        text-red-600
+        w-fit
+    "
+                      >
+                        🩸
+                        {member.bloodGroup.replaceAll("_", " ")}
+                      </p>
+                    </div>
+                  </div>
 
-                                        </p>
-
-
-                                    </div>
-
-
-                                </div>
-
-
-
-
-
-
-                                <div
-                                    className="
+                  <div
+                    className="
                                         mt-5
                                         flex
                                         items-center
@@ -603,100 +355,47 @@ export default function MembersPage(){
                                         border-brand-gold/20
                                         pt-4
                                     "
-                                >
-
-
-                                    <div>
-
-                                        <p
-                                            className="
+                  >
+                    <div>
+                      <p
+                        className="
                                                 text-xs
                                                 text-gray-500
                                             "
-                                        >
-                                            Balance
-                                        </p>
+                      >
+                        Balance
+                      </p>
 
-
-                                        <div
-                                            className="
+                      <div
+                        className="
                                                 flex
                                                 items-center
                                                 gap-2
                                                 font-bold
                                                 text-brand-green
                                             "
-                                        >
-
-                                            <Wallet size={16}/>
-
-                                            ৳
-                                            {
-                                                member.totalBalance
-                                                .toLocaleString()
-                                            }
-
-                                        </div>
-
-
-                                    </div>
-
-
-
-                                    <StatusBadge
-                                        status={
-                                            member.status
-                                        }
-                                    />
-
-
-                                </div>
-
-
-                            </motion.div>
-
-
-                            </Link>
-
-
-                        ))
-
-                    }
-
-
+                      >
+                        <Wallet size={16} />৳
+                        {member.totalBalance.toLocaleString()}
+                      </div>
                     </div>
 
-
-                }
-
-
-
-            </motion.div>
-
-
-        </Container>
-
-    );
-
+                    <StatusBadge status={member.status} />
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </motion.div>
+    </Container>
+  );
 }
 
-
-
-
-
-
-
-function StatusBadge({
-    status
-}:{
-    status:UserStatus
-}){
-
-
-    return (
-
-        <span
-            className={`
+function StatusBadge({ status }: { status: UserStatus }) {
+  return (
+    <span
+      className={`
                 rounded-full
                 px-3
                 py-1
@@ -704,25 +403,15 @@ function StatusBadge({
                 font-semibold
 
                 ${
-                    status==="ACTIVE"
-                    ?
-                    "bg-green-100 text-green-700"
-
-                    :
-                    status==="INACTIVE"
-                    ?
-                    "bg-yellow-100 text-yellow-700"
-
-                    :
-                    "bg-red-100 text-red-700"
+                  status === "ACTIVE"
+                    ? "bg-green-100 text-green-700"
+                    : status === "INACTIVE"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
                 }
             `}
-        >
-
-            {status}
-
-        </span>
-
-    );
-
+    >
+      {status}
+    </span>
+  );
 }
