@@ -1,110 +1,54 @@
+"use client";
+
 import Sidebar from "@/components/dashboard/sidebar";
 import Container from "@/components/ui/container";
-// import { redirect } from "next/navigation";
-// import { cookies } from "next/headers";
+import { useAuth } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
-
-// const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-
-
-export default async function DashboardLayout({
-    children,
+export default function DashboardLayout({
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
+  const { admin, loading } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (!loading && !admin) {
+      router.replace("/");
+    }
+  }, [admin, loading, router]);
 
-    // const cookieStore = await cookies();
-
-
-    // const token =
-    //     cookieStore.get(
-    //         "accessToken"
-    //     );
-
-
-
-    // if (!token) {
-
-    //     redirect("/login");
-
-    // }
-
-
-
-    // // Verify token with backend
-
-    // try {
-
-
-    //     const res =
-    //         await fetch(
-    //             `${API_URL}/admin/me`,
-    //             {
-    //                 method:"GET",
-
-    //                 headers:{
-    //                     Cookie:
-    //                         `${token.name}=${token.value}`
-    //                 },
-
-    //                 cache:"no-store"
-    //             }
-    //         );
-
-
-
-    //     if(!res.ok){
-
-    //         redirect("/login");
-
-    //     }
-
-
-    // } catch(error){
-
-    //     redirect("/login");
-
-    // }
-
-
-
-
+  if (loading) {
     return (
-
-        <Container>
-
-            <div
-                className="
-                    flex
-                    h-[calc(100vh-96px)]
-                    overflow-hidden
-                "
-            >
-
-                <Sidebar />
-
-
-                <main
-                    className="
-                        flex-1
-                        overflow-y-auto
-                        px-8
-                        py-8
-                    "
-                >
-
-                    {children}
-
-                </main>
-
-
-            </div>
-
-
-        </Container>
-
+      <main className="flex min-h-screen items-center justify-center bg-brand-cream">
+        <Loader2 size={40} className="animate-spin text-brand-green" />
+      </main>
     );
+  }
 
+  if (!admin) {
+    return null;
+  }
+
+  return (
+    <Container>
+      <div className="flex h-[calc(100vh-96px)] overflow-hidden">
+        <Sidebar />
+
+        <main
+          className="
+              flex-1
+              overflow-y-auto
+              px-8
+              py-8
+            "
+        >
+          {children}
+        </main>
+      </div>
+    </Container>
+  );
 }

@@ -24,15 +24,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
+          <Navbar />
 
-            <Navbar />
+          <ToastProvider />
 
-            <ToastProvider />
-
-            <main className="pt-24">
-              {children}
-            </main>
-
+          <main className="pt-24">{children}</main>
         </AuthProvider>
       </body>
     </html>

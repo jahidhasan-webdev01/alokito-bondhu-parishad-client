@@ -5,7 +5,8 @@ import { Search, UserRound, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { DateInput, DateInputOnChange } from "@/components/ui/date";
+import { DateInputOnChange } from "@/components/ui/date";
+import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -52,9 +53,7 @@ export default function AddPaymentPage() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [paymentDate, setPaymentDate] = useState(
-    new Date()
-      .toISOString()
-      .split("T")[0]
+    new Date().toISOString().split("T")[0],
   );
   const [paymentType, setPaymentType] = useState("CASH");
   const [isLate, setIsLate] = useState(false);
@@ -82,6 +81,8 @@ export default function AddPaymentPage() {
     fetchMembers();
   }, []);
 
+  // console.log("members", members);
+
   // 2. Filter Members Search
   useEffect(() => {
     if (!search.trim()) {
@@ -94,7 +95,7 @@ export default function AddPaymentPage() {
       (member) =>
         member.memberId?.toLowerCase().includes(value) ||
         member.fullName?.toLowerCase().includes(value) ||
-        member.mobile?.includes(value)
+        member.mobile?.includes(value),
     );
 
     setFilteredMembers(result);
@@ -102,18 +103,11 @@ export default function AddPaymentPage() {
 
   // 3. Auto-detect Late Payment (after day 10)
   useEffect(() => {
-
     if (paymentDate) {
-
-      const day =
-        Number(
-          paymentDate.split("-")[2]
-        );
+      const day = Number(paymentDate.split("-")[2]);
 
       setIsLate(day > 10);
-
     }
-
   }, [paymentDate]);
 
   // 4. Form Submission
@@ -178,37 +172,32 @@ export default function AddPaymentPage() {
 
       {/* Member Selection Section */}
       <section className="border-b border-brand-gold/30 pb-8">
-
-        <h2 className="
+        <h2
+          className="
         mb-5
         text-xl
         font-semibold
         text-brand-green
-    ">
+    "
+        >
           Select Member
         </h2>
 
-
-
-        <div className="
+        <div
+          className="
         flex
         items-center
         gap-3
         border-b
         border-brand-gold/30
         pb-3
-    ">
-
-          <Search
-            size={20}
-            className="text-brand-green"
-          />
+    "
+        >
+          <Search size={20} className="text-brand-green" />
 
           <input
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by member ID, name, or mobile"
             className="
                 w-full
@@ -216,11 +205,7 @@ export default function AddPaymentPage() {
                 outline-none
             "
           />
-
         </div>
-
-
-
 
         {/* Member List Container */}
 
@@ -234,64 +219,31 @@ export default function AddPaymentPage() {
             scrollbar-thin
         "
         >
-
-
-          {
-            loading ? (
-
-              <p className="text-gray-500">
-                Loading members...
-              </p>
-
-
-            ) : filteredMembers.length === 0 ? (
-
-
-              <p className="text-gray-500">
-                No members found.
-              </p>
-
-
-            ) : (
-
-              filteredMembers.map(
-                (
-                  member,
-                  index
-                ) => (
-
-                  <motion.button
-
-                    key={member.memberId}
-
-                    initial={{
-                      opacity: 0,
-                      y: 15
-                    }}
-
-                    animate={{
-                      opacity: 1,
-                      y: 0
-                    }}
-
-                    transition={{
-                      delay: index * 0.03
-                    }}
-
-
-                    whileTap={{
-                      scale: 0.98
-                    }}
-
-
-                    type="button"
-
-                    onClick={() =>
-                      setSelected(member)
-                    }
-
-
-                    className={`
+          {loading ? (
+            <p className="text-gray-500">Loading members...</p>
+          ) : filteredMembers.length === 0 ? (
+            <p className="text-gray-500">No members found.</p>
+          ) : (
+            filteredMembers.map((member, index) => (
+              <motion.button
+                key={member.memberId}
+                initial={{
+                  opacity: 0,
+                  y: 15,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: index * 0.03,
+                }}
+                whileTap={{
+                  scale: 0.98,
+                }}
+                type="button"
+                onClick={() => setSelected(member)}
+                className={`
                         w-full
                         flex
                         items-center
@@ -302,203 +254,158 @@ export default function AddPaymentPage() {
                         text-left
                         transition
 
-                        ${selected?.memberId
-                        ===
-                        member.memberId
-
-                        ?
-
-                        "border-brand-green bg-brand-green/5"
-
-                        :
-
-                        "border-brand-gold/30 hover:border-brand-green/50"
-                      }
+                        ${
+                          selected?.memberId === member.memberId
+                            ? "border-brand-green bg-brand-green/5"
+                            : "border-brand-gold/30 hover:border-brand-green/50"
+                        }
                     `}
-
-                  >
-
-
-                    <div className="
-                        flex
-                        h-10
-                        w-10
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-brand-green/10
-                    ">
-
-                      <UserRound
-                        size={20}
-                        className="text-brand-green"
-                      />
-
+              >
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-brand-green/10">
+                  {member.image ? (
+                    <Image
+                      src={member.image}
+                      alt={member.fullName}
+                      width={80}
+                      height={80}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center rounded-full bg-brand-green/10">
+                      <UserRound className="h-10 w-10 text-brand-green" />
                     </div>
+                  )}
+                </div>
 
-
-
-                    <div>
-
-                      <h3 className="
+                <div>
+                  <h3
+                    className="
                             font-semibold
                             text-brand-green
-                        ">
-                        {member.fullName}
-                      </h3>
+                        "
+                  >
+                    {member.fullName}
+                  </h3>
 
+                  <p className="text-sm text-gray-500">{member.memberId}</p>
 
-                      <p className="text-sm text-gray-500">
-                        {member.memberId}
-                      </p>
-
-
-                      <p className="text-sm text-gray-500">
-                        {member.mobile}
-                      </p>
-
-
-                    </div>
-
-
-                  </motion.button>
-
-
-                ))
-
-            )
-          }
-
-
+                  <p className="text-sm text-gray-500">{member.mobile}</p>
+                </div>
+              </motion.button>
+            ))
+          )}
         </div>
-
-
       </section>
 
       {/* Payment Details Section */}
       <AnimatePresence>
+        {selected && (
+          <motion.section
+            initial={{
+              opacity: 0,
+              y: 30,
+              height: 0,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              height: "auto",
+            }}
+            exit={{
+              opacity: 0,
+              y: -20,
+              height: 0,
+            }}
+            transition={{
+              duration: 0.35,
+            }}
+            className="space-y-6 border-b border-brand-gold/30 pb-8"
+          >
+            <h2 className="text-xl font-semibold text-brand-green">
+              Payment Information
+            </h2>
 
-        {
-          selected && (
+            <div className="grid gap-5 md:grid-cols-4">
+              <Input
+                label="Transaction ID"
+                value={transactionId}
+                onChange={(e: any) => setTransactionId(e.target.value)}
+                placeholder="e.g. TXN123456"
+              />
 
-            <motion.section
+              <Select
+                label="Month"
+                value={month}
+                onChange={(e: any) => setMonth(Number(e.target.value))}
+                options={months}
+              />
 
-              initial={{
-                opacity: 0,
-                y: 30,
-                height: 0
-              }}
+              <Input
+                label="Year"
+                type="number"
+                value={year}
+                onChange={(e: any) => setYear(Number(e.target.value))}
+              />
 
-              animate={{
-                opacity: 1,
-                y: 0,
-                height: "auto"
-              }}
+              <DateInputOnChange
+                label="Payment Date"
+                name="paymentDate"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+                required
+              />
+            </div>
 
-              exit={{
-                opacity: 0,
-                y: -20,
-                height: 0
-              }}
+            <div className="grid gap-5 md:grid-cols-3">
+              <Select
+                label="Payment Type"
+                value={paymentType}
+                onChange={(e: any) => setPaymentType(e.target.value)}
+                options={paymentTypes}
+              />
 
-              transition={{
-                duration: 0.35
-              }}
+              <Input
+                label="Monthly Amount"
+                value={`৳ ${MONTHLY_AMOUNT}`}
+                readOnly
+              />
 
-              className="space-y-6 border-b border-brand-gold/30 pb-8"
-            >
-              <h2 className="text-xl font-semibold text-brand-green">
-                Payment Information
-              </h2>
+              <Input
+                label="Total Payable"
+                value={`৳ ${totalAmount}`}
+                readOnly
+              />
+            </div>
 
-              <div className="grid gap-5 md:grid-cols-4">
-                <Input
-                  label="Transaction ID"
-                  value={transactionId}
-                  onChange={(e: any) => setTransactionId(e.target.value)}
-                  placeholder="e.g. TXN123456"
+            <div className="flex flex-wrap items-center justify-between gap-4 border border-brand-gold/30 p-5">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="lateFeeCheck"
+                  checked={isLate}
+                  onChange={(e) => setIsLate(e.target.checked)}
+                  className="h-5 w-5 accent-brand-green cursor-pointer"
                 />
-
-                <Select
-                  label="Month"
-                  value={month}
-                  onChange={(e: any) => setMonth(Number(e.target.value))}
-                  options={months}
-                />
-
-                <Input
-                  label="Year"
-                  type="number"
-                  value={year}
-                  onChange={(e: any) => setYear(Number(e.target.value))}
-                />
-
-                <DateInputOnChange
-                  label="Payment Date"
-                  name="paymentDate"
-                  value={paymentDate}
-                  onChange={(e) =>
-                    setPaymentDate(e.target.value)
-                  }
-                  required
-                />
-
+                <label
+                  htmlFor="lateFeeCheck"
+                  className="text-sm font-medium text-brand-green cursor-pointer select-none"
+                >
+                  Late Payment Fee (+৳{LATE_FEE})
+                </label>
               </div>
 
-              <div className="grid gap-5 md:grid-cols-3">
-                <Select
-                  label="Payment Type"
-                  value={paymentType}
-                  onChange={(e: any) => setPaymentType(e.target.value)}
-                  options={paymentTypes}
-                />
-
-                <Input
-                  label="Monthly Amount"
-                  value={`৳ ${MONTHLY_AMOUNT}`}
-                  readOnly
-                />
-
-                <Input
-                  label="Total Payable"
-                  value={`৳ ${totalAmount}`}
-                  readOnly
-                />
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-4 border border-brand-gold/30 p-5">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="lateFeeCheck"
-                    checked={isLate}
-                    onChange={(e) => setIsLate(e.target.checked)}
-                    className="h-5 w-5 accent-brand-green cursor-pointer"
-                  />
-                  <label
-                    htmlFor="lateFeeCheck"
-                    className="text-sm font-medium text-brand-green cursor-pointer select-none"
-                  >
-                    Late Payment Fee (+৳{LATE_FEE})
-                  </label>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <Wallet className="text-brand-green" />
-                  <div>
-                    <p className="text-sm text-gray-500">Current Balance</p>
-                    <h3 className="text-xl font-bold text-brand-green">
-                      ৳ {selected.totalBalance ?? 0}
-                    </h3>
-                  </div>
+              <div className="flex items-center gap-4">
+                <Wallet className="text-brand-green" />
+                <div>
+                  <p className="text-sm text-gray-500">Current Balance</p>
+                  <h3 className="text-xl font-bold text-brand-green">
+                    ৳ {selected.totalBalance ?? 0}
+                  </h3>
                 </div>
               </div>
-            </motion.section>
-
-          )
-
-        }
-
+            </div>
+          </motion.section>
+        )}
       </AnimatePresence>
 
       {/* Submit Button */}
